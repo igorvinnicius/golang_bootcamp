@@ -39,12 +39,15 @@ func main(){
 	
 	var err error
 	
-	homeTemplate, err = template.ParseFiles("views/home.gohtml")
+	homeTemplate, err = template.ParseFiles(
+		"views/home.gohtml",
+		"views/layouts/footer.gohtml")
 	if err != nil {
 		panic(err)
 	}
 
-	contactTemplate, err = template.ParseFiles("views/contact.gohtml")
+	contactTemplate, err = template.ParseFiles("views/contact.gohtml",
+	"views/layouts/footer.gohtml")
 	if err != nil {
 		panic(err)
 	}
