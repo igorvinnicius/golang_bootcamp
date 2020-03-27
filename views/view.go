@@ -1,6 +1,15 @@
 package views
 
-import "html/template"
+import (
+	"html/template"
+	"path/filepath"
+	"net/http"
+)
+
+var (
+	LayoutDirectory = "views/layouts/"
+	LayoutExtension = ".gohtml"
+)
 
 type View struct{
 	Template *template.Template
@@ -8,13 +17,11 @@ type View struct{
 }
 
 func NewView(layout string, files ...string) *View {
-	files = append(files, 
-		"views/layouts/bootstrap.gohtml",
-		"views/layouts/navbar.gohtml",
-		"views/layouts/footer.gohtml",
-	)
-
+	
+	files = append(files, layoutFiles()...)
+	
 	t, err := template.ParseFiles(files...)
+	
 	if err != nil{
 		panic(err)
 	}
@@ -23,5 +30,21 @@ func NewView(layout string, files ...string) *View {
 		Template: t,
 		Layout: layout,
 	}
+}
+
+func (v *View) Render(w http.ResponseWriter, data interface{}) error {
+	
+	return v.Template.ExecuteTemplate(w, v.Layout, data)
+}
+
+func layoutFiles() []string{
+	
+	files, err := filepath.Glob(LayoutDirectory + "*" + LayoutExtension)
+	
+	if err != nil{
+		panic(err)
+	}
+	
+	return files
 }
 
