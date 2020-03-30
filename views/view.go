@@ -8,6 +8,7 @@ import (
 
 var (
 	LayoutDirectory = "views/layouts/"
+	TemplateDir = "views/"
 	LayoutExtension = ".gohtml"
 )
 
@@ -18,6 +19,9 @@ type View struct{
 
 func NewView(layout string, files ...string) *View {
 	
+	addTemplatePath(files)
+	addTemplateExtension(files)
+
 	files = append(files, layoutFiles()...)
 	
 	t, err := template.ParseFiles(files...)
@@ -53,4 +57,17 @@ func layoutFiles() []string{
 	
 	return files
 }
+
+func addTemplatePath(files []string) {
+	for i,f := range files {
+		files[i] = TemplateDir + f
+	}
+}
+
+func addTemplateExtension(files []string) {
+	for i,f := range files {
+		files[i] = f + LayoutExtension
+	}
+}
+
 
