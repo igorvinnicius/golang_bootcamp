@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"github.com/igorvinnicius/lenslocked-go-web/views"
-	"github.com/gorilla/schema"
 )
 
 type SignupForm struct {
@@ -29,15 +28,10 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request){
 }
 
 func (u *Users) Create(w http.ResponseWriter, r *http.Request){
-	
-	if err := r.ParseForm(); err != nil {
-		panic(err)
-	}
-	
+		
 	var form SignupForm
-	dec := schema.NewDecoder()
-	
-	if err:= dec.Decode(&form, r.PostForm); err != nil {
+
+	if err := parseForm(r, &form); err != nil {
 		panic(err)
 	}
 
