@@ -1,28 +1,35 @@
 package main
 
 import (
-	"html/template"
-	"os"
+	"database/sql"
+	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
-type User struct{
-	Name string
-	Dog string
-}
+const(
+	host = "localhost"
+	port = 5432
+	user = "postgres"
+	password = "0000"
+	dbname = "lenslocked_dev"
+)
 
-func main(){
-	t, err := template.ParseFiles("hello.gohtml")
+func main() {
+	psqlinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	db, err := sql.Open("postgres", psqlinfo)
 	if err != nil {
 		panic(err)
 	}
 
-	data := User{
-		Name: "Jon Snow",
-		Dog: "Ghost",
-	}
+	err = db.Ping()
 
-	err = t.Execute(os.Stdout, data)
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("Successfully connected!")
+	db.Close()
+
 }
+
