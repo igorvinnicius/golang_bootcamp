@@ -1,10 +1,9 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-
-	_ "github.com/lib/pq"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 const(
@@ -15,28 +14,21 @@ const(
 	dbname = "lenslocked_dev"
 )
 
+type User struct {
+	gorm.Model
+	Name string
+	Email string `gorm:"not null;unique_index"`
+}
+
 func main() {
 	psqlinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	db, err := sql.Open("postgres", psqlinfo)
+	db, err := gorm.Open("postgres", psqlinfo)
 	if err != nil {
 		panic(err)
 	}
 
 	defer db.Close()
 
-	var id int
-
-	err = db.QueryRow(`
-		INSERT INTO users(name, email)
-		values($1,$2)
-		RETURNING id`,
-		"Jon Snow", "snow@email.com").Scan(&id)
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Id is...", id)
-
+	db.AutoMigrate(&User{})
 }
 
