@@ -37,9 +37,7 @@ func main() {
 
 	var u User
 	db.First(&u)
-	fmt.Println(u)
-
-	
+	fmt.Println(u)	
 }
 
 func createUser(db *gorm.DB) {
