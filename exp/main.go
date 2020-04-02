@@ -32,10 +32,17 @@ func main() {
 	}
 
 	defer db.Close()
-
 	db.LogMode(true)
 	db.AutoMigrate(&User{})
 
+	var u User
+	db.First(&u)
+	fmt.Println(u)
+
+	
+}
+
+func createUser(db *gorm.DB) {
 	name, email, color := getInfo()
 
 	u := User{
@@ -44,7 +51,7 @@ func main() {
 		Color: color,
 	}
 
-	if err = db.Create(&u).Error; err != nil {
+	if err := db.Create(&u).Error; err != nil {
 		panic(err)
 	}
 
