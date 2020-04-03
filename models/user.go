@@ -45,6 +45,10 @@ func (us *UserService) ById(id uint) (*User, error) {
 	}
 }
 
+func (us *UserService) ById(user *User) error {
+	return us.db.Create(user).Error
+}
+
 func (us *UserService) Close() error {
 	return us.db.Close()
 }
