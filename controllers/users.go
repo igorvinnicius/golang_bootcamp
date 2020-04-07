@@ -41,7 +41,8 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request){
 
 	user := models.User {
 		Name: form.Name,
-		Email: form.Email,		
+		Email: form.Email,
+		Password: form.Password,
 	}
 	
 	if err:= u.UserService.Create(&user); err != nil {
@@ -49,5 +50,5 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
-	fmt.Fprintln(w, form)	
+	fmt.Fprintln(w, user)	
 }
