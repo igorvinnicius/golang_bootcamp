@@ -13,15 +13,22 @@ type SignupForm struct {
 	Password string `schema:"password"`
 }
 
+type LoginForm struct {	
+	Email string `schema:"email"`
+	Password string `schema:"password"`
+}
+
 func NewUsers(userService *models.UserService) *Users {
 	return &Users{
 		NewView: views.NewView("bootstrap", "users/new"),
-		UserService : userService,	
+		LoginView: views.NewView("bootstrap", "users/login"),
+		UserService : userService,
 	}
 }
 
 type Users struct{
 	NewView *views.View
+	LoginView *views.View
 	UserService *models.UserService
 }
 
@@ -51,4 +58,15 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request){
 	}
 
 	fmt.Fprintln(w, user)	
+}
+
+func (u *Users) Login(w http.ResponseWriter, r *http.Request){
+	
+	var form LoginForm
+
+	if err := parseForm(r, &form); err != nil {
+		panic(err)
+	}
+
+	fmt.Fprintln(w, form)
 }

@@ -41,6 +41,8 @@ func main() {
 	r.Handle("/contact", staticController.ContactView).Methods("GET")
 	r.HandleFunc("/signup", usersController.New).Methods("GET")
 	r.HandleFunc("/signup", usersController.Create).Methods("POST")
+	r.Handle("/login", usersController.LoginView).Methods("GET")
+	r.HandleFunc("/login", usersController.Login).Methods("POST")
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 	
 	fmt.Println("Starting the server on :3000...")

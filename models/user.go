@@ -65,7 +65,7 @@ func first(db *gorm.DB, dest interface{}) error {
 
 func (us *UserService) Create(user *User) error {
 
-	passwordBytes := []byte(user.PAssword + userPwPepper)
+	passwordBytes := []byte(user.Password + userPwPepper)
 
 	hashedBytes, err := bcrypt.GenerateFromPassword(passwordBytes, bcrypt.DefaultCost)
 
