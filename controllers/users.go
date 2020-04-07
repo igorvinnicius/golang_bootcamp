@@ -68,5 +68,16 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request){
 		panic(err)
 	}
 
-	fmt.Fprintln(w, form)
+	user, err := u.UserService.Authenticate(form.Email, form.Password)
+
+	switch err {
+		case models.ErrNotFound:
+			fmt.Fprintln(w, "Invalid email adrress")
+		case models.ErrInvalidPassword:
+			fmt.Fprintln(w, "Invalid password provided")
+		case nil:
+			fmt.Fprintln(w, user)
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+	}	
 }
