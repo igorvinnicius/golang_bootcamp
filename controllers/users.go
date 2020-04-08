@@ -52,12 +52,14 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request){
 		Password: form.Password,
 	}
 	
-	if err:= u.UserService.Create(&user); err != nil {
+	if err := u.UserService.Create(&user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return 
 	}
 
-	fmt.Fprintln(w, user)	
+	signIn(w, &user)
+
+	http.Redirect(w, r, "/cookietest", http.StatusFound)
 }
 
 func (u *Users) Login(w http.ResponseWriter, r *http.Request){
@@ -83,6 +85,13 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
+	signIn(w, user)
+
+	http.Redirect(w, r, "/cookietest", http.StatusFound)
+}
+
+func signIn(w http.ResponseWriter, user *models.User) {
+
 	cookie := http.Cookie {
 
 		Name: "email",
@@ -91,7 +100,6 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request){
 
 	http.SetCookie(w, &cookie)
 
-	fmt.Fprintln(w, user)
 }
 
 func (u *Users) CookieTest(w http.ResponseWriter, r *http.Request) {
