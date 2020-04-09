@@ -19,7 +19,7 @@ type LoginForm struct {
 	Password string `schema:"password"`
 }
 
-func NewUsers(userService *models.UserService) *Users {
+func NewUsers(userService models.UserService) *Users {
 	return &Users{
 		NewView: views.NewView("bootstrap", "users/new"),
 		LoginView: views.NewView("bootstrap", "users/login"),
@@ -30,7 +30,7 @@ func NewUsers(userService *models.UserService) *Users {
 type Users struct{
 	NewView *views.View
 	LoginView *views.View
-	UserService *models.UserService
+	UserService models.UserService
 }
 
 func (u *Users) New(w http.ResponseWriter, r *http.Request){

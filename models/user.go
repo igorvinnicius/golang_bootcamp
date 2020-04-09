@@ -35,6 +35,12 @@ type UserDB interface {
 	DestructiveReset() error
 }
 
+type UserService interface {
+
+	Authenticate(email, password string) (*User, error)
+	UserDB
+}
+
 type User struct {
 	gorm.Model
 	Name string
@@ -45,14 +51,14 @@ type User struct {
 	RememberHash string `gorm:"not null;unique_index"`
 }
 
-func NewUserService(connectionInfo string) (*UserService, error) {
+func NewUserService(connectionInfo string) (UserService, error) {
 	
 	ug, err := newUserGorm(connectionInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	return &UserService{
+	return &userService {
 		UserDB : &userValidator {
 			UserDB: ug,
 		},
@@ -75,9 +81,13 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 	}, nil
 }
 
-type UserService struct {
+var _ UserService = &userService{}
+
+type userService struct {
 	UserDB
 }
+
+var _ UserDB = &userValidator{}
 
 type userValidator struct {
 	UserDB
@@ -123,7 +133,7 @@ func first(db *gorm.DB, dest interface{}) error {
 	return err
 }
 
-func (us *UserService) Authenticate(email, password string) (*User, error) {
+func (us *userService) Authenticate(email, password string) (*User, error) {
 	
 	foundUser, err := us.ByEmail(email)
 
