@@ -121,7 +121,8 @@ func (uv *userValidator) Create(user *User) error {
 		user.Remember = token		
 	}
 
-	if err := runUserValFuncs(user, uv.bcryptPassword, uv.hmacRemember); err != nil {
+	err := runUserValFuncs(user, uv.bcryptPassword, uv.hmacRemember);
+	if err != nil {
 		return err
 	}		
 
@@ -130,7 +131,8 @@ func (uv *userValidator) Create(user *User) error {
 
 func (uv *userValidator) Update(user *User) error {
 
-	if err := runUserValFuncs(user, uv.bcryptPassword, uv.hmacemember); err != nil {
+	err := runUserValFuncs(user, uv.bcryptPassword, uv.hmacRemember);
+	if err != nil {
 		return err
 	}	
 
