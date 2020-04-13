@@ -1,6 +1,7 @@
 package models
 
 import(
+	"string"
 	"errors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -111,8 +112,13 @@ type userValidator struct {
 
 func (uv *userValidator) Create(user *User) error {
 	
-	err := runUserValFuncs(user, uv.bcryptPassword, uv.setRememberIfUnset, uv.hmacRemember);
-	if err != nil {
+	err := runUserValFuncs(user, 
+		uv.bcryptPassword, 
+		uv.setRememberIfUnset, 
+		uv.hmacRemember
+		uv.normalizeEmail);
+	
+		if err != nil {
 		return err
 	}		
 
@@ -121,7 +127,11 @@ func (uv *userValidator) Create(user *User) error {
 
 func (uv *userValidator) Update(user *User) error {
 
-	err := runUserValFuncs(user, uv.bcryptPassword, uv.hmacRemember);
+	err := runUserValFuncs(user, 
+		uv.bcryptPassword, 
+		uv.hmacRemember
+		uv.normalizeEmail);
+		
 	if err != nil {
 		return err
 	}	
@@ -131,9 +141,13 @@ func (uv *userValidator) Update(user *User) error {
 
 func (uv *userValidator) Delete(id uint) error {
 	
-	if id == 0 {
-		return ErrInvalidID
-	}
+	var user User
+	user.ID = id
+
+	err := runUserValFuncs(&user, uv.idGreaterThan(0));
+	if err != nil {
+		return err
+	}	
 
 	return uv.UserDB.Delete(id)
 }
@@ -183,6 +197,35 @@ func (uv *userValidator) setRememberIfUnset(user *User) error {
 	user.Remember = token			
 
 	return nil
+}
+
+func (uv *userValidator) idGreaterThan(n uint) userValFunc { 
+
+	return userValFunc(func(user *User) error {
+
+		if user.ID <= n {
+			return ErrInvalidID
+		}
+		return nil
+	})	
+}
+
+func (uv *userValidator) normalizeEmail(user *User) error { 
+	user.Email = string.ToLower(user.Email)
+	user.Email = string.TrimSpace(user.Email)
+	return nil
+}
+
+func (uv *userValidator) ByEmail(email string) (*User, error) {
+	user := User{
+		Email: email
+	}
+
+	if err := runUserValFuncs(&user, uv.normalizeEmail); err != nil {
+		return nil, err
+	}
+
+	return uv.UserDB.ByEmail(user.Email)
 }
 
 func (uv *userValidator) ByRemember(token string) (*User, error) {
