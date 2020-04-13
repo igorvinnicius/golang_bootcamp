@@ -15,11 +15,13 @@ import(
 
 var(
 	ErrNotFound = errors.New("models: resource not found")
-	ErrInvalidID = errors.New("models: ID must me > 0")	
-	ErrInvalidPassword = errors.New("models: incorrect password provided")
+	ErrIDInvalid = errors.New("models: ID must me > 0")	
+	ErrPasswordIncorrect = errors.New("models: incorrect password provided")
 	ErrEmailRequired = errors.New("models: email is required")
 	ErrEmailInvalid = errors.New("models: email is required")
 	ErrEmailTaken = errors.New("models: email address is already taken")
+	ErrPasswordTooShort = errors.New("models: password must be at least 8 ccarachters long")
+	ErrPasswordRequired =  errors.New("models: password is required")
 )
 
 const userPwPepper = "secret-random-string"
@@ -125,7 +127,10 @@ func newUserValidator(udb UserDB, hmac hash.HMAC) *userValidator {
 func (uv *userValidator) Create(user *User) error {
 	
 	err := runUserValFuncs(user, 
-		uv.bcryptPassword, 
+		uv.passwordRequired,
+		uv.passwordMinLength,
+		uv.bcryptPassword,
+		uv.passwordHashRequired,
 		uv.setRememberIfUnset, 
 		uv.hmacRemember,
 		uv.normalizeEmail,
@@ -143,7 +148,9 @@ func (uv *userValidator) Create(user *User) error {
 func (uv *userValidator) Update(user *User) error {
 
 	err := runUserValFuncs(user, 
-		uv.bcryptPassword, 
+		uv.passwordMinLength,
+		uv.bcryptPassword,
+		uv.passwordHashRequired,
 		uv.hmacRemember,
 		uv.normalizeEmail,
 		uv.requireEmail,
@@ -222,7 +229,7 @@ func (uv *userValidator) idGreaterThan(n uint) userValFunc {
 	return userValFunc(func(user *User) error {
 
 		if user.ID <= n {
-			return ErrInvalidID
+			return ErrIDInvalid
 		}
 		return nil
 	})	
@@ -273,6 +280,35 @@ func (uv *userValidator) emailIsAvail(user *User) error {
 		return ErrEmailTaken
 	}
 
+	return nil
+}
+
+func (uv *userValidator) passwordRequired(user *User) error { 
+	if user.Password == "" {
+		return ErrPasswordRequired
+	}
+
+	return nil
+}
+
+func (uv *userValidator) passwordHashRequired(user *User) error { 
+	if user.PasswordHash == "" {
+		return ErrPasswordRequired
+	}
+
+	return nil
+}
+
+func (uv *userValidator) passwordMinLength(user *User) error { 
+
+	if user.Password == "" {
+		return nil
+	}
+
+	if len(user.Password) < 8 {
+		return ErrPasswordTooShort
+	}
+	
 	return nil
 }
 
@@ -352,7 +388,7 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 	if err != nil {
 		switch err {
 			case bcrypt.ErrMismatchedHashAndPassword:
-				return nil, ErrInvalidPassword	
+				return nil, ErrPasswordIncorrect
 			default:
 				return nil, err
 		}
@@ -375,7 +411,7 @@ func (ug *userGorm) Update(user *User) error {
 func (ug *userGorm) Delete(id uint) error {
 	
 	if id == 0 {
-		return ErrInvalidID
+		return ErrIDInvalid
 	}
 
 	user := User{Model: gorm.Model{ID: id}}
