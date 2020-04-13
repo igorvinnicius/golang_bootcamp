@@ -33,26 +33,13 @@ type Users struct{
 	UserService models.UserService
 }
 
-func (u *Users) New(w http.ResponseWriter, r *http.Request){
+func (u *Users) New(w http.ResponseWriter, r *http.Request){	
 	
-	type Alert struct {
-		Level string
-		Message string
-	}
-
-	type Data struct {
-		Alert Alert
-		Yeld interface {}
-	}
-	
-	a := Alert {
-		Level: "success",
-		Message: "Successfully rendered a dynamic alert!",
-	}
-
-	d := Data {
-		Alert: a,
-		Yeld: "Hello",
+	d := views.Data{
+		Alert: &views.Alert{
+			Level: views.AlertLevelError,
+			Message: "something went wrong",
+		},
 	}
 
 	if err := u.NewView.Render(w, d); err != nil {
