@@ -13,8 +13,12 @@
             {{template "navbar"}}
 
             <div class="container-fluid">
-                {{template "alert" .}}
-                {{ template "yeld" .}}
+                
+                {{if .Alert}}
+                    {{template "alert" .Alert}}
+                {{end}}
+                
+                {{ template "yeld" .Yeld}}
                 {{template "footer"}}
             </div>
             

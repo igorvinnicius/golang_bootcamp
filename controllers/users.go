@@ -39,13 +39,23 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request){
 		Level string
 		Message string
 	}
+
+	type Data struct {
+		Alert Alert
+		Yeld interface {}
+	}
 	
 	a := Alert {
 		Level: "success",
 		Message: "Successfully rendered a dynamic alert!",
 	}
 
-	if err := u.NewView.Render(w, a); err != nil {
+	d := Data {
+		Alert: a,
+		Yeld: "Hello",
+	}
+
+	if err := u.NewView.Render(w, d); err != nil {
 		panic(err)
 	}
 }
