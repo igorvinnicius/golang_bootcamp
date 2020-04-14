@@ -5,6 +5,8 @@ const(
 	AlertLevelWarning = "warning"
 	AlertLevelInfo = "info"
 	AlertLevelSuccess = "success"
+
+	AlertGenericMessage = "Something went wrong. Please try again!"
 )
 
 type Alert struct {
