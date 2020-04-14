@@ -2,8 +2,7 @@ package models
 
 import(	
 	"regexp"
-	"strings"
-	"errors"
+	"strings"	
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 
@@ -11,19 +10,6 @@ import(
 
 	"github.com/igorvinnicius/lenslocked-go-web/hash"
 	"github.com/igorvinnicius/lenslocked-go-web/rand"
-)
-
-var(
-	ErrNotFound = errors.New("models: resource not found")
-	ErrIDInvalid = errors.New("models: ID must me > 0")	
-	ErrPasswordIncorrect = errors.New("models: incorrect password provided")
-	ErrEmailRequired = errors.New("models: email is required")
-	ErrEmailInvalid = errors.New("models: email is required")
-	ErrEmailTaken = errors.New("models: email address is already taken")
-	ErrPasswordTooShort = errors.New("models: password must be at least 8 ccarachters long")
-	ErrPasswordRequired =  errors.New("models: password is required")
-	ErrRememberTooShort = errors.New("models: remember token must be at least 32 bytes")
-	ErrRememberRequired = errors.New("models: remember token is required")
 )
 
 const userPwPepper = "secret-random-string"
@@ -216,7 +202,7 @@ func (uv *userValidator) hmacRemember(user *User) error {
 
 func (uv *userValidator) setRememberIfUnset(user *User) error { 
 
-	if user.Remember == "" {
+	if user.Remember != "" {
 		return nil
 	}	
 	

@@ -48,10 +48,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request){
 
 	if err := parseForm(r, &form); err != nil {
 		log.Println(err)
-		vd.Alert = &views.Alert{
-			Level: views.AlertLevelError,
-			Message: views.AlertGenericMessage,
-		}
+		vd.SetAlert(err)
 		u.NewView.Render(w, vd)
 		return
 	}
@@ -62,12 +59,8 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request){
 		Password: form.Password,
 	}
 	
-	if err := u.UserService.Create(&user); err != nil {
-		
-		vd.Alert = &views.Alert{
-			Level: views.AlertLevelError,
-			Message: err.Error(),
-		}
+	if err := u.UserService.Create(&user); err != nil {		
+		vd.SetAlert(err)
 		u.NewView.Render(w, vd)
 		return		
 	}
