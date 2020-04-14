@@ -76,10 +76,14 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request){
 
 func (u *Users) Login(w http.ResponseWriter, r *http.Request){
 	
+	vd := views.Data{}
 	var form LoginForm
 
 	if err := parseForm(r, &form); err != nil {
-		panic(err)
+		log.Println(err)
+		vd.SetAlert(err)
+		u.LoginView.Render(w, vd)
+		return
 	}
 
 	user, err := u.UserService.Authenticate(form.Email, form.Password)
@@ -87,19 +91,19 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		switch err {
 			case models.ErrNotFound:
-				fmt.Fprintln(w, "Invalid email adrress")
-			case models.ErrPasswordIncorrect:
-				fmt.Fprintln(w, "Invalid password provided")			
+				vd.AlertError("Invalid email address.")								
 			default:
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				vd.SetAlert(err)
 		}	
-
+		u.LoginView.Render(w, vd)
 		return
 	}
 
 	err = u.signIn(w, user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		vd.SetAlert(err)
+		u.LoginView.Render(w, vd)
+		return
 	}
 
 	http.Redirect(w, r, "/cookietest", http.StatusFound)
