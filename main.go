@@ -47,6 +47,7 @@ func main() {
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 	
 	r.Handle("/galleries/new", galleriesController.New).Methods("GET")
+	r.HandleFunc("/galleries", galleriesController.Create).Methods("POST")
 
 	fmt.Println("Starting the server on :3000...")
 	
