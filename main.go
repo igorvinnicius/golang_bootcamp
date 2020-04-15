@@ -34,6 +34,7 @@ func main() {
 
 	staticController := controllers.NewStatic()
 	usersController := controllers.NewUsers(services.User)
+	galleriesController := controllers.NewGalleries(services.Gallery)
 
 	r := mux.NewRouter()	
 	r.Handle("/", staticController.HomeView).Methods("GET")
@@ -45,6 +46,8 @@ func main() {
 	r.HandleFunc("/cookietest", usersController.CookieTest).Methods("GET")
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 	
+	r.Handle("/galleries/new", galleriesController.New).Methods("GET")
+
 	fmt.Println("Starting the server on :3000...")
 	
 	http.ListenAndServe(":3000", r)
