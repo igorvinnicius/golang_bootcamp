@@ -46,33 +46,15 @@ type User struct {
 	RememberHash string `gorm:"not null;unique_index"`
 }
 
-func NewUserService(connectionInfo string) (UserService, error) {
+func NewUserService(db *gorm.DB) UserService {
 	
-	ug, err := newUserGorm(connectionInfo)
-	if err != nil {
-		return nil, err
-	}
-
+	ug := &userGorm{db}
 	hmac := hash.NewHMAC(hmacSecretKey)
-
 	uv := newUserValidator(ug, hmac)
 
 	return &userService {
 		UserDB : uv,
-	}, nil
-}
-
-func newUserGorm(connectionInfo string) (*userGorm, error) {
-	db, err := gorm.Open("postgres", connectionInfo)
-	if err != nil {
-		return nil, err
 	}
-
-	db.LogMode(true)	
-
-	return &userGorm{
-		db: db,	
-	}, nil
 }
 
 var _ UserService = &userService{}

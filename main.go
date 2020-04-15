@@ -26,15 +26,15 @@ func notFound(w http.ResponseWriter, r *http.Request){
 func main() {
 	
 	psqlinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	us, err := models.NewUserService(psqlinfo)
+	services, err := models.NewServices(psqlinfo)
 	must(err)
 
-	defer us.Close()
-
-	us.AutoMigrate()
+	//TO DO fix this
+	// defer us.Close()
+	// us.AutoMigrate()
 
 	staticController := controllers.NewStatic()
-	usersController := controllers.NewUsers(us)
+	usersController := controllers.NewUsers(services.User)
 
 	r := mux.NewRouter()	
 	r.Handle("/", staticController.HomeView).Methods("GET")
