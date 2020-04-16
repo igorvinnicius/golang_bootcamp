@@ -5,7 +5,8 @@ import(
 	"net/http"	
 	"github.com/gorilla/mux"
 	"github.com/igorvinnicius/lenslocked-go-web/controllers"
-	"github.com/igorvinnicius/lenslocked-go-web/models"	
+	"github.com/igorvinnicius/lenslocked-go-web/models"
+	"github.com/igorvinnicius/lenslocked-go-web/middleware"	
 )
 
 const(
@@ -46,8 +47,12 @@ func main() {
 	r.HandleFunc("/cookietest", usersController.CookieTest).Methods("GET")
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 	
-	r.Handle("/galleries/new", galleriesController.New).Methods("GET")
-	r.HandleFunc("/galleries", galleriesController.Create).Methods("POST")
+	requireUserMw := middleware.RequireUser{
+		UserService: services.User,
+	}	
+
+	r.Handle("/galleries/new", requireUserMw.Apply(galleriesController.New)).Methods("GET")
+	r.HandleFunc("/galleries", requireUserMw.ApplyFn(galleriesController.Create)).Methods("POST")
 
 	fmt.Println("Starting the server on :3000...")
 	
