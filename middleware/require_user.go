@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"fmt"
+	"fmt"	
 	"net/http"
 	"github.com/igorvinnicius/lenslocked-go-web/models"
+	"github.com/igorvinnicius/lenslocked-go-web/context"
 )
 
 type RequireUser struct {
@@ -31,6 +32,11 @@ func (mw *RequireUser) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		
+		ctx := r.Context()
+		ctx = context.WithUser(ctx, user)
+
+		r = r.WithContext(ctx)
+
 		fmt.Println(user)
 
 		next(w, r)
