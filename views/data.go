@@ -16,7 +16,7 @@ type Alert struct {
 
 type Data struct {
 	Alert *Alert
-	Yeld interface {}
+	Yield interface {}
 }
 
 func (d *Data) SetAlert(err error) {

@@ -46,7 +46,7 @@ func (v *View) Render(w http.ResponseWriter, data interface{}) {
 			//do nothing
 		default: 
 			data = Data {
-				Yeld: data,
+				Yield: data,
 			}
 	}
 
