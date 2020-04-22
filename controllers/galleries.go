@@ -13,6 +13,7 @@ import (
 
 const(
 	ShowGallery = "show_gallery"
+	EditGallery = "edit_gallery"
 )
 
 func NewGalleries(galleryService models.GalleryService, r *mux.Router) *Galleries {
@@ -20,6 +21,7 @@ func NewGalleries(galleryService models.GalleryService, r *mux.Router) *Gallerie
 		New: views.NewView("bootstrap", "galleries/new"),
 		ShowView: views.NewView("bootstrap", "galleries/show"),
 		EditView: views.NewView("bootstrap", "galleries/edit"),
+		IndexView: views.NewView("bootstrap", "galleries/index"),
 		GalleryService : galleryService,
 		r: r,
 	}
@@ -29,6 +31,7 @@ type Galleries struct{
 	New *views.View	
 	ShowView *views.View
 	EditView *views.View
+	IndexView *views.View
 	GalleryService models.GalleryService
 	r *mux.Router
 }
@@ -36,6 +39,21 @@ type Galleries struct{
 type GalleryForm struct {
 	Title string `schema:"title"`	
 }
+
+func (g *Galleries) Index(w http.ResponseWriter, r *http.Request) {		
+
+	user := context.User(r.Context())
+	galleries, err := g.GalleryService.ByUserID(user.ID)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	var vd views.Data
+	vd.Yield = galleries
+	g.IndexView.Render(w, vd)	
+}
+
 
 func (g *Galleries) Show(w http.ResponseWriter, r *http.Request) {	
 	
@@ -131,7 +149,7 @@ func (g *Galleries) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintln(w, "Successfully deleted!")	
+	http.Redirect(w, r, "/galleries", http.StatusFound)	
 }
 
 func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) {
@@ -164,7 +182,7 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) {
 		return		
 	}
 
-	url, err := g.r.Get(ShowGallery).URL("id", fmt.Sprintf("%v", gallery.ID))
+	url, err := g.r.Get(EditGallery).URL("id", fmt.Sprintf("%v", gallery.ID))
 	if err != nil {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
