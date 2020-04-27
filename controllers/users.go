@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-	"github.com/igorvinnicius/lenslocked-go-web/views"
 	"github.com/igorvinnicius/lenslocked-go-web/models"
 	"github.com/igorvinnicius/lenslocked-go-web/rand"
+	"github.com/igorvinnicius/lenslocked-go-web/views"
+	"log"
+	"net/http"
 )
 
 type SignupForm struct {
@@ -35,7 +35,7 @@ type Users struct{
 }
 
 func (u *Users) New(w http.ResponseWriter, r *http.Request){	
-	u.NewView.Render(w, nil)	
+	u.NewView.Render(w, r,nil)
 }
 
 func (u *Users) Create(w http.ResponseWriter, r *http.Request){
@@ -46,7 +46,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request){
 	if err := parseForm(r, &form); err != nil {
 		log.Println(err)
 		vd.SetAlert(err)
-		u.NewView.Render(w, vd)
+		u.NewView.Render(w, r, vd)
 		return
 	}
 
@@ -58,17 +58,18 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request){
 	
 	if err := u.UserService.Create(&user); err != nil {		
 		vd.SetAlert(err)
-		u.NewView.Render(w, vd)
+		u.NewView.Render(w, r, vd)
 		return		
 	}
 
 	err := u.signIn(w, &user)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
+		fmt.Println(err)
 		return
 	}
 
-	http.Redirect(w, r, "/cookietest", http.StatusFound)
+	http.Redirect(w, r, "/galleries", http.StatusFound)
 }
 
 func (u *Users) Login(w http.ResponseWriter, r *http.Request){
@@ -79,7 +80,7 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request){
 	if err := parseForm(r, &form); err != nil {
 		log.Println(err)
 		vd.SetAlert(err)
-		u.LoginView.Render(w, vd)
+		u.LoginView.Render(w, r, vd)
 		return
 	}
 
@@ -92,18 +93,18 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request){
 			default:
 				vd.SetAlert(err)
 		}	
-		u.LoginView.Render(w, vd)
+		u.LoginView.Render(w, r, vd)
 		return
 	}
 
 	err = u.signIn(w, user)
 	if err != nil {
 		vd.SetAlert(err)
-		u.LoginView.Render(w, vd)
+		u.LoginView.Render(w, r, vd)
 		return
 	}
 
-	http.Redirect(w, r, "/cookietest", http.StatusFound)
+	http.Redirect(w, r, "/galleries", http.StatusFound)
 }
 
 func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
