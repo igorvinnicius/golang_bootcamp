@@ -3,8 +3,17 @@
         <div class="col-md-6 offset-md-3">
             <div class="card" style="width: 20rem;">
                 <div class="card-body">
-                    <h5 class="card-title">Edit your gallery</h5>
-                    {{template "editGalleryForm" .}}
+                    <div class="col-md-12">
+                        <h5 class="card-title">Edit your gallery</h5>
+                        {{template "editGalleryForm" .}}
+                    </div>
+                    <div class="col-md-12">                        
+                        {{template "uploadImageForm" .}}
+                    </div>
+                     <div class="col-md-12">                        
+                        {{template "deleteGalleryForm" .}}
+                    </div>
+                    
                 </div>
             </div>
          </div>
@@ -18,8 +27,21 @@
             <input type="text" name="title" class="form-control" id="title" value="{{.Title}}">            
         </div>                   
         <button type="submit" class="btn btn-primary">Update</button>
-    </form>
-     <form action="/galleries/{{.ID}}/delete" method="POST">                          
+    </form>    
+{{end}}
+
+{{define "deleteGalleryForm"}}
+    <form action="/galleries/{{.ID}}/delete" method="POST">                          
         <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+{{end}}
+
+{{define "uploadImageForm"}}
+      <form action="/galleries/{{.ID}}/images" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="images">Upload new images</label>
+            <input type="file" class="form-control-file" id="images" name="images">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
     </form>
 {{end}}
